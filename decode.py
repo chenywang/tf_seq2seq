@@ -41,7 +41,7 @@ def load_config(FLAGS):
     
     config = util.unicode_to_utf8(
         json.load(open('%s.json' % FLAGS.model_path, 'rb')))
-    for key, value in FLAGS.__flags.items():
+    for key, value in FLAGS.flag_values_dict().items():
         config[key] = value
 
     return config
