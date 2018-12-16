@@ -22,6 +22,7 @@ tf.app.flags.DEFINE_string('target_train_data', 'data/europarl-v7.de-en.en', 'Pa
 tf.app.flags.DEFINE_string('source_valid_data', '', 'Path to source validation data')
 tf.app.flags.DEFINE_string('target_valid_data', '', 'Path to target validation data')
 
+
 # Network parameters
 tf.app.flags.DEFINE_string('cell_type', 'lstm', 'RNN cell for encoder and decoder, default: lstm')
 tf.app.flags.DEFINE_string('attention_type', 'bahdanau', 'Attention mechanism: (bahdanau, luong), default: bahdanau')
