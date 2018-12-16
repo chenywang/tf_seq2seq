@@ -1,17 +1,18 @@
+import gzip
+
 import numpy as np
 
-import gzip
 from util import load_dict
 
 # Extra vocabulary symbols
 _GO = '_GO'
-EOS = '_EOS' # also function as PAD
+EOS = '_EOS'  # also function as PAD
 UNK = '_UNK'
 
 extra_tokens = [_GO, EOS, UNK]
 
-start_token = extra_tokens.index(_GO)	# start_token = 0
-end_token = extra_tokens.index(EOS)	# end_token = 1
+start_token = extra_tokens.index(_GO)  # start_token = 0
+end_token = extra_tokens.index(EOS)  # end_token = 1
 unk_token = extra_tokens.index(UNK)
 
 
@@ -60,12 +61,12 @@ def prepare_batch(seqs_x, maxlen=None):
             return None, None
 
     batch_size = len(seqs_x)
-    
+
     x_lengths = np.array(lengths_x)
     maxlen_x = np.max(x_lengths)
 
     x = np.ones((batch_size, maxlen_x)).astype('int32') * end_token
-    
+
     for idx, s_x in enumerate(seqs_x):
         x[idx, :lengths_x[idx]] = s_x
     return x, x_lengths
@@ -97,7 +98,7 @@ def prepare_train_batch(seqs_x, seqs_y, maxlen=None):
             return None, None, None, None
 
     batch_size = len(seqs_x)
-    
+
     x_lengths = np.array(lengths_x)
     y_lengths = np.array(lengths_y)
 
@@ -106,7 +107,7 @@ def prepare_train_batch(seqs_x, seqs_y, maxlen=None):
 
     x = np.ones((batch_size, maxlen_x)).astype('int32') * end_token
     y = np.ones((batch_size, maxlen_y)).astype('int32') * end_token
-    
+
     for idx, [s_x, s_y] in enumerate(zip(seqs_x, seqs_y)):
         x[idx, :lengths_x[idx]] = s_x
         y[idx, :lengths_y[idx]] = s_y

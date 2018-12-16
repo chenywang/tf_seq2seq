@@ -1,27 +1,18 @@
-
-#!/usr/bin/env python
+# !/usr/bin/env python
 # coding: utf-8
 
-import os
-import math
-import time
 import json
-import random
-
+import math
+import os
+import time
 from collections import OrderedDict
 
 import numpy as np
 import tensorflow as tf
 
-from data.data_iterator import TextIterator
 from data.data_iterator import BiTextIterator
-
-import data.data_utils as data_utils
-from data.data_utils import prepare_batch
 from data.data_utils import prepare_train_batch
-
 from seq2seq_model import Seq2SeqModel
-
 
 # Data loading parameters
 tf.app.flags.DEFINE_string('source_vocabulary', 'data/europarl-v7.1.4M.de.json', 'Path to source vocabulary')
@@ -68,8 +59,8 @@ tf.app.flags.DEFINE_boolean('log_device_placement', False, 'Log placement of ops
 
 FLAGS = tf.app.flags.FLAGS
 
-def create_model(session, FLAGS):
 
+def create_model(session, FLAGS):
     config = OrderedDict(sorted(FLAGS.__flags.items()))
     model = Seq2SeqModel(config, 'train')
 
@@ -77,14 +68,15 @@ def create_model(session, FLAGS):
     if ckpt and tf.train.checkpoint_exists(ckpt.model_checkpoint_path):
         print 'Reloading model parameters..'
         model.restore(session, ckpt.model_checkpoint_path)
-        
+
     else:
         if not os.path.exists(FLAGS.model_dir):
             os.makedirs(FLAGS.model_dir)
         print 'Created new model parameters..'
         session.run(tf.global_variables_initializer())
-   
+
     return model
+
 
 def train():
     # Load parallel data to train
@@ -115,16 +107,15 @@ def train():
         valid_set = None
 
     # Initiate TF session
-    with tf.Session(config=tf.ConfigProto(allow_soft_placement=FLAGS.allow_soft_placement, 
-        log_device_placement=FLAGS.log_device_placement, gpu_options=tf.GPUOptions(allow_growth=True))) as sess:
-        
+    with tf.Session(config=tf.ConfigProto(allow_soft_placement=FLAGS.allow_soft_placement,
+                                          log_device_placement=FLAGS.log_device_placement,
+                                          gpu_options=tf.GPUOptions(allow_growth=True))) as sess:
+
         # Create a new model or reload existing checkpoint
         model = create_model(sess, FLAGS)
-        
+
         # Create a log writer object
         log_writer = tf.summary.FileWriter(FLAGS.model_dir, graph=sess.graph)
-
-        
 
         step_time, loss = 0.0, 0.0
         words_seen, sents_seen = 0, 0
@@ -135,10 +126,10 @@ def train():
         for epoch_idx in xrange(FLAGS.max_epochs):
             if model.global_epoch_step.eval() >= FLAGS.max_epochs:
                 print 'Training is already complete.', \
-                      'current epoch:{}, max epoch:{}'.format(model.global_epoch_step.eval(), FLAGS.max_epochs)
+                    'current epoch:{}, max epoch:{}'.format(model.global_epoch_step.eval(), FLAGS.max_epochs)
                 break
 
-            for source_seq, target_seq in train_set:    
+            for source_seq, target_seq in train_set:
                 # Get a batch from training parallel data
                 source, source_len, target, target_len = prepare_train_batch(source_seq, target_seq,
                                                                              FLAGS.max_seq_length)
@@ -147,15 +138,14 @@ def train():
                     continue
 
                 # Execute a single training step
-                step_loss, summary = model.train(sess, encoder_inputs=source, encoder_inputs_length=source_len, 
+                step_loss, summary = model.train(sess, encoder_inputs=source, encoder_inputs_length=source_len,
                                                  decoder_inputs=target, decoder_inputs_length=target_len)
 
                 loss += float(step_loss) / FLAGS.display_freq
-                words_seen += float(np.sum(source_len+target_len))
-                sents_seen += float(source.shape[0]) # batch_size
+                words_seen += float(np.sum(source_len + target_len))
+                sents_seen += float(source.shape[0])  # batch_size
 
                 if model.global_step.eval() % FLAGS.display_freq == 0:
-
                     avg_perplexity = math.exp(float(loss)) if loss < 300 else float("inf")
 
                     time_elapsed = time.time() - start_time
@@ -165,8 +155,8 @@ def train():
                     sents_per_sec = sents_seen / time_elapsed
 
                     print 'Epoch ', model.global_epoch_step.eval(), 'Step ', model.global_step.eval(), \
-                          'Perplexity {0:.2f}'.format(avg_perplexity), 'Step-time ', step_time, \
-                          '{0:.2f} sents/s'.format(sents_per_sec), '{0:.2f} words/s'.format(words_per_sec)
+                        'Perplexity {0:.2f}'.format(avg_perplexity), 'Step-time ', step_time, \
+                        '{0:.2f} sents/s'.format(sents_per_sec), '{0:.2f} words/s'.format(words_per_sec)
 
                     loss = 0
                     words_seen = 0
@@ -209,16 +199,15 @@ def train():
             # Increase the epoch index of the model
             model.global_epoch_step_op.eval()
             print 'Epoch {0:} DONE'.format(model.global_epoch_step.eval())
-        
+
         print 'Saving the last model..'
         checkpoint_path = os.path.join(FLAGS.model_dir, FLAGS.model_name)
         model.save(sess, checkpoint_path, global_step=model.global_step)
         json.dump(model.config,
                   open('%s-%d.json' % (checkpoint_path, model.global_step.eval()), 'wb'),
                   indent=2)
-        
-    print 'Training Terminated'
 
+    print 'Training Terminated'
 
 
 def main(_):
