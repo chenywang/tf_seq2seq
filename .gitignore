@@ -5,3 +5,5 @@ europarl-v7.*
 newstest*
 .ipynb*
 .idea/
+*.text
+*.csv
