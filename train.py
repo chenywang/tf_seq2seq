@@ -15,12 +15,12 @@ from data.data_utils import prepare_train_batch
 from seq2seq_model import Seq2SeqModel
 
 # Data loading parameters
-tf.app.flags.DEFINE_string('source_vocabulary', 'data/europarl-v7.1.4M.de.json', 'Path to source vocabulary')
-tf.app.flags.DEFINE_string('target_vocabulary', 'data/europarl-v7.1.4M.fr.json', 'Path to target vocabulary')
-tf.app.flags.DEFINE_string('source_train_data', 'data/europarl-v7.1.4M.de', 'Path to source training data')
-tf.app.flags.DEFINE_string('target_train_data', 'data/europarl-v7.1.4M.fr', 'Path to target training data')
-tf.app.flags.DEFINE_string('source_valid_data', 'data/newstest2012.bpe.de', 'Path to source validation data')
-tf.app.flags.DEFINE_string('target_valid_data', 'data/newstest2012.bpe.fr', 'Path to target validation data')
+tf.app.flags.DEFINE_string('source_vocabulary', 'data/europarl-v7.de-en.shuf.de.json', 'Path to source vocabulary')
+tf.app.flags.DEFINE_string('target_vocabulary', 'data/europarl-v7.de-en.shuf.en.json', 'Path to target vocabulary')
+tf.app.flags.DEFINE_string('source_train_data', 'data/europarl-v7.de-en.de', 'Path to source training data')
+tf.app.flags.DEFINE_string('target_train_data', 'data/europarl-v7.de-en.en', 'Path to target training data')
+tf.app.flags.DEFINE_string('source_valid_data', '', 'Path to source validation data')
+tf.app.flags.DEFINE_string('target_valid_data', '', 'Path to target validation data')
 
 # Network parameters
 tf.app.flags.DEFINE_string('cell_type', 'lstm', 'RNN cell for encoder and decoder, default: lstm')
